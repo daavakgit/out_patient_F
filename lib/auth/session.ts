@@ -8,12 +8,17 @@ export interface UserSession extends TokenPayload {
   userDocId: string;
 }
 
-export async function getCurrentUser(): Promise<UserSession | null> {
-  const token = await getSessionToken();
+export async function getCurrentUser(roleHint?: 'ADMIN' | 'THERAPIST' | 'PATIENT'): Promise<UserSession | null> {
+  const token = await getSessionToken(roleHint);
   if (!token) return null;
 
   const decoded = verifyToken(token);
   if (!decoded) return null;
+
+  // If roleHint was explicitly provided and doesn't match decoded role, reject
+  if (roleHint && decoded.role !== roleHint) {
+    return null;
+  }
 
   await connectToDatabase();
 
@@ -48,8 +53,8 @@ export async function getCurrentUser(): Promise<UserSession | null> {
   };
 }
 
-export async function requireAuth(): Promise<UserSession> {
-  const session = await getCurrentUser();
+export async function requireAuth(roleHint?: 'ADMIN' | 'THERAPIST' | 'PATIENT'): Promise<UserSession> {
+  const session = await getCurrentUser(roleHint);
   if (!session) {
     throw new Error('UNAUTHORIZED');
   }
@@ -57,9 +62,31 @@ export async function requireAuth(): Promise<UserSession> {
 }
 
 export async function requireRole(allowedRoles: Array<'ADMIN' | 'THERAPIST' | 'PATIENT'>): Promise<UserSession> {
-  const session = await requireAuth();
+  // If only one role is allowed (e.g. ['THERAPIST']), pass it directly as hint
+  let session: UserSession | null = null;
+  
+  if (allowedRoles.length === 1) {
+    session = await getCurrentUser(allowedRoles[0]);
+  } else {
+    // If multiple roles allowed, try the matching role hint first based on request or try allowed roles
+    for (const r of allowedRoles) {
+      session = await getCurrentUser(r);
+      if (session && allowedRoles.includes(session.role)) break;
+    }
+  }
+
+  if (!session) {
+    // Fallback attempt without role hint
+    session = await getCurrentUser();
+  }
+
+  if (!session) {
+    throw new Error('UNAUTHORIZED');
+  }
+
   if (!allowedRoles.includes(session.role)) {
     throw new Error('FORBIDDEN');
   }
+
   return session;
 }

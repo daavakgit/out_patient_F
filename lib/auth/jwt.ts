@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'rehabpulse_super_secret_jwt_key_2026_production_grade_32byte';
 
@@ -24,8 +24,68 @@ export function verifyToken(token: string): TokenPayload | null {
   }
 }
 
-export async function getSessionToken(): Promise<string | null> {
+export async function getSessionToken(roleHint?: 'ADMIN' | 'THERAPIST' | 'PATIENT'): Promise<string | null> {
   const cookieStore = cookies();
-  const token = cookieStore.get('rehabpulse_token')?.value;
-  return token || null;
+  let headerStore: ReturnType<typeof headers> | null = null;
+  try {
+    headerStore = headers();
+  } catch {
+    // headers() might not be available in non-request contexts
+  }
+
+  // 1. Check Bearer token in Authorization header
+  if (headerStore) {
+    const authHeader = headerStore.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      const bearerToken = authHeader.substring(7).trim();
+      if (bearerToken) return bearerToken;
+    }
+  }
+
+  // 2. Determine target role from hint, x-portal-role header, or referer URL
+  let targetRole = roleHint;
+  if (!targetRole && headerStore) {
+    const portalHeader = headerStore.get('x-portal-role')?.toUpperCase();
+    if (portalHeader === 'THERAPIST' || portalHeader === 'PATIENT' || portalHeader === 'ADMIN') {
+      targetRole = portalHeader as any;
+    } else {
+      const referer = headerStore.get('referer')?.toLowerCase() || '';
+      if (referer.includes('/therapist')) targetRole = 'THERAPIST';
+      else if (referer.includes('/patient')) targetRole = 'PATIENT';
+      else if (referer.includes('/admin')) targetRole = 'ADMIN';
+    }
+  }
+
+  // 3. If targetRole is identified, check its dedicated role cookie
+  if (targetRole === 'THERAPIST') {
+    const token = cookieStore.get('rehabpulse_token_therapist')?.value;
+    if (token) return token;
+  } else if (targetRole === 'PATIENT') {
+    const token = cookieStore.get('rehabpulse_token_patient')?.value;
+    if (token) return token;
+  } else if (targetRole === 'ADMIN') {
+    const token = cookieStore.get('rehabpulse_token_admin')?.value;
+    if (token) return token;
+  }
+
+  // 4. Check general cookie rehabpulse_token
+  const defaultToken = cookieStore.get('rehabpulse_token')?.value;
+  if (defaultToken) {
+    if (targetRole) {
+      const decoded = verifyToken(defaultToken);
+      if (decoded && decoded.role === targetRole) {
+        return defaultToken;
+      }
+    } else {
+      return defaultToken;
+    }
+  }
+
+  // 5. Fallback: check any present role-specific token
+  return (
+    cookieStore.get('rehabpulse_token_therapist')?.value ||
+    cookieStore.get('rehabpulse_token_patient')?.value ||
+    cookieStore.get('rehabpulse_token_admin')?.value ||
+    null
+  );
 }

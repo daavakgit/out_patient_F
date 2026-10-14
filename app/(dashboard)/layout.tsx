@@ -17,9 +17,67 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     fetchSession();
   }, [pathname]);
 
+  useEffect(() => {
+    const portalRole = pathname.startsWith('/therapist')
+      ? 'THERAPIST'
+      : pathname.startsWith('/patient')
+      ? 'PATIENT'
+      : pathname.startsWith('/admin')
+      ? 'ADMIN'
+      : '';
+
+    if (!portalRole || typeof window === 'undefined') return;
+
+    try {
+      sessionStorage.setItem('rehabpulse_active_portal', portalRole);
+    } catch (e) {
+      // sessionStorage might be restricted
+    }
+
+    const originalFetch = window.fetch;
+    window.fetch = async function (input: RequestInfo | URL, init?: RequestInit) {
+      try {
+        const urlStr =
+          typeof input === 'string'
+            ? input
+            : input instanceof URL
+            ? input.toString()
+            : (input as Request).url || '';
+
+        if (urlStr.startsWith('/api') || urlStr.includes('/api/')) {
+          const headers = new Headers(
+            init?.headers ||
+              (typeof input === 'object' && 'headers' in input ? (input as any).headers : {})
+          );
+          if (!headers.has('x-portal-role')) {
+            headers.set('x-portal-role', portalRole);
+          }
+          return originalFetch(input, { ...init, headers });
+        }
+      } catch (err) {
+        // fallback to original fetch if url parsing fails
+      }
+      return originalFetch(input, init);
+    };
+
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, [pathname]);
+
   const fetchSession = async () => {
     try {
-      const res = await fetch('/api/auth/me');
+      const portalRole = pathname.startsWith('/therapist')
+        ? 'THERAPIST'
+        : pathname.startsWith('/patient')
+        ? 'PATIENT'
+        : pathname.startsWith('/admin')
+        ? 'ADMIN'
+        : '';
+
+      const res = await fetch(`/api/auth/me?portal=${portalRole.toLowerCase()}`, {
+        headers: portalRole ? { 'x-portal-role': portalRole } : {},
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.authenticated && data.user) {

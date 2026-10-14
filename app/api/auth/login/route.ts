@@ -54,6 +54,7 @@ export async function POST(req: Request) {
 
     const response = NextResponse.json({
       message: 'Login successful',
+      token,
       user: {
         id: user._id.toString(),
         name: user.name,
@@ -65,13 +66,26 @@ export async function POST(req: Request) {
       },
     });
 
-    response.cookies.set('rehabpulse_token', token, {
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'lax' as const,
       path: '/',
       maxAge: 7 * 24 * 60 * 60, // 7 days
-    });
+    };
+
+    // Set role-specific isolated cookie
+    const roleCookieName =
+      user.role === 'THERAPIST'
+        ? 'rehabpulse_token_therapist'
+        : user.role === 'PATIENT'
+        ? 'rehabpulse_token_patient'
+        : 'rehabpulse_token_admin';
+
+    response.cookies.set(roleCookieName, token, cookieOptions);
+
+    // Also set active default cookie
+    response.cookies.set('rehabpulse_token', token, cookieOptions);
 
     return response;
   } catch (error: any) {

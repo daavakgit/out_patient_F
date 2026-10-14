@@ -31,6 +31,14 @@ export default function LoginPage() {
         throw new Error(data.error || 'Login failed');
       }
 
+      // Store in tab-specific sessionStorage
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('rehabpulse_active_portal', data.user.role);
+        if (data.token) {
+          sessionStorage.setItem('rehabpulse_tab_token', data.token);
+        }
+      }
+
       // Redirect based on role
       const role = data.user.role;
       if (role === 'ADMIN') router.push('/admin/dashboard');

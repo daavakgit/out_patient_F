@@ -140,7 +140,17 @@ export default function Header({
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-portal-role': user?.role || '',
+        },
+        body: JSON.stringify({ role: user?.role }),
+      });
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('rehabpulse_active_portal');
+      }
       router.push('/login');
       router.refresh();
     } catch (e) {
