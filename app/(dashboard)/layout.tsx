@@ -85,7 +85,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           isSidebarCollapsed={sidebarCollapsed}
           onToggleSidebarCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
-        <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-[1600px] w-full mx-auto animate-fade-in">{children}</main>
+        <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-[1600px] w-full mx-auto">{children}</main>
       </div>
     </div>
   );

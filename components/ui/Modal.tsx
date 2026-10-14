@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 interface ModalProps {
@@ -27,9 +28,15 @@ export default function Modal({
   footer,
   noBodyPadding = false,
   customWidth,
-  maxHeight = 'calc(100dvh - 32px)',
+  maxHeight = 'calc(100vh - 48px)',
   className = '',
 }: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -45,12 +52,23 @@ export default function Modal({
     }
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
-      style={{ boxSizing: 'border-box' }}
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-5 md:p-6 bg-slate-900/65 backdrop-blur-xs overflow-y-auto animate-fade-in"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100%',
+        height: '100%',
+        boxSizing: 'border-box',
+      }}
       onClick={onClose}
     >
       <div
@@ -59,7 +77,7 @@ export default function Modal({
           boxSizing: 'border-box',
           width: customWidth || undefined,
           maxWidth: customWidth ? '100%' : undefined,
-          maxHeight: maxHeight || 'calc(100dvh - 32px)',
+          maxHeight: maxHeight || 'calc(100vh - 40px)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -97,6 +115,8 @@ export default function Modal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
+
