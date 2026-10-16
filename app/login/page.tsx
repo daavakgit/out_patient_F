@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -9,6 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'therapist' | 'patient' | null>(null);
 
   const videoTallRef = useRef<HTMLVideoElement>(null);
   const videoWideRef = useRef<HTMLVideoElement>(null);
@@ -53,7 +55,8 @@ export default function LoginPage() {
     }
   };
 
-  const fillCredentials = (eMail: string, pass: string = 'password123') => {
+  const fillCredentials = (role: 'admin' | 'therapist' | 'patient', eMail: string, pass: string = 'password123') => {
+    setSelectedRole(role);
     setEmail(eMail);
     setPassword(pass);
     setError('');
@@ -83,10 +86,8 @@ export default function LoginPage() {
       "pad": 0.1076, "h1Top": 0.08656, "h1Fs": 0.06839, "subTop": 0.17368, "subFs": 0.0309,
       "emTop": 0.25435, "emH": 0.10257, "emR": 0.0202, "ephFs": 0.02702, "ephPad": 0.0332,
       "pwTop": 0.36851, "pwH": 0.10839, "btnTop": 0.50435, "btnH": 0.10981, "btnFs": 0.0275,
-      "arrow": 0.026, "btnGap": 0.02, "divTop": 0.68222, "orFs": 0.02245, "orPad": 0.051,
-      "divH": 0.0026, "gTop": 0.76445, "gH": 0.09966, "gIcon": 0.032, "gtFs": 0.03205,
-      "gGap": 0.026, "btTop": 0.89668, "btFs": 0.02876, "heroFs": 0.1058, "badgeH": 0.0742,
-      "heroLh": 1.1246, "heroBot": 0.06493, "heroGap": -0.30423, "heroSide": 0.0525
+      "arrow": 0.026, "btnGap": 0.02, "demoTop": 0.655,
+      "badgeH": 0.0742, "heroLh": 1.1246, "heroBot": 0.06493, "heroGap": -0.30423, "heroSide": 0.0525, "heroFs": 0.1058
     };
 
     var mqPortrait = window.matchMedia('(min-width:700px) and (max-aspect-ratio:51/50)');
@@ -181,15 +182,7 @@ export default function LoginPage() {
         document.documentElement.style.setProperty('--tp-btn-h', Math.round(cardH * TP.btnH) + 'px');
         document.documentElement.style.setProperty('--tp-btn-fs', (S * TP.btnFs) + 'px');
         document.documentElement.style.setProperty('--tp-btn-gap', Math.round(S * TP.btnGap) + 'px');
-        document.documentElement.style.setProperty('--tp-div-top', Math.round(cardH * TP.divTop) + 'px');
-        document.documentElement.style.setProperty('--tp-or-fs', (S * TP.orFs) + 'px');
-        document.documentElement.style.setProperty('--tp-or-pad', Math.round(cardW * TP.orPad) + 'px');
-        document.documentElement.style.setProperty('--tp-g-top', Math.round(cardH * TP.gTop) + 'px');
-        document.documentElement.style.setProperty('--tp-g-h', Math.round(cardH * TP.gH) + 'px');
-        document.documentElement.style.setProperty('--tp-gt-fs', (S * TP.gtFs) + 'px');
-        document.documentElement.style.setProperty('--tp-g-gap', Math.round(S * TP.gGap) + 'px');
-        document.documentElement.style.setProperty('--tp-bt-top', Math.round(cardH * TP.btTop) + 'px');
-        document.documentElement.style.setProperty('--tp-bt-fs', (S * TP.btFs) + 'px');
+        document.documentElement.style.setProperty('--tp-demo-top', Math.round(cardH * TP.demoTop) + 'px');
         return;
       }
 
@@ -255,23 +248,18 @@ export default function LoginPage() {
     var emailEl = document.getElementById('email');
     var pwEl = document.getElementById('pw');
     var loginBtnEl = document.getElementById('loginBtn');
-    var dividerEl = document.querySelector('.divider');
-    var gBtnEl = document.getElementById('gBtn');
-    var bottomEl = document.getElementById('bottom');
+    var demoSectionEl = document.getElementById('demoSection');
 
     var steps = [
       { el: cardEl, delay: 40, duration: 820, ease: ease, from: { opacity: 0, transform: compact ? 'translateY(14px)' : 'translateY(12px) scale(.988)' } },
-      { el: badgeEl, delay: 120, duration: 480, ease: softEase, from: { opacity: 0, transform: 'translateY(8px)' } },
-      { el: hl1El, delay: 240, duration: 760, ease: ease, from: { opacity: 0, transform: compact ? 'translateY(12px)' : 'translateY(16px)', clipPath: 'inset(100% 0 0 0)' }, to: { opacity: 1, transform: 'none', clipPath: 'inset(0 0 0 0)' } },
+      { el: hl1El, delay: 200, duration: 760, ease: ease, from: { opacity: 0, transform: compact ? 'translateY(12px)' : 'translateY(16px)', clipPath: 'inset(100% 0 0 0)' }, to: { opacity: 1, transform: 'none', clipPath: 'inset(0 0 0 0)' } },
       { el: hl2El, delay: 330, duration: 760, ease: ease, from: { opacity: 0, transform: compact ? 'translateY(12px)' : 'translateY(16px)', clipPath: 'inset(100% 0 0 0)' }, to: { opacity: 1, transform: 'none', clipPath: 'inset(0 0 0 0)' } },
       { el: h1El, delay: 470, duration: 620, ease: ease, from: { opacity: 0, transform: 'translateY(10px)' } },
       { el: subEl, delay: 570, duration: 560, ease: ease, from: { opacity: 0, transform: 'translateY(10px)' } },
       { el: emailEl, delay: 720, duration: 520, ease: softEase, from: { opacity: 0, transform: 'translateY(8px)' } },
       { el: pwEl, delay: 790, duration: 520, ease: softEase, from: { opacity: 0, transform: 'translateY(8px)' } },
       { el: loginBtnEl, delay: 930, duration: 560, ease: ease, from: { opacity: 0, transform: 'translateY(8px)' } },
-      { el: dividerEl, delay: 1060, duration: 440, ease: softEase, from: { opacity: 0, transform: 'translateY(6px)' } },
-      { el: gBtnEl, delay: 1150, duration: 540, ease: ease, from: { opacity: 0, transform: 'translateY(8px)' } },
-      { el: bottomEl, delay: 1260, duration: 500, ease: softEase, from: { opacity: 0, transform: 'translateY(6px)' } }
+      { el: demoSectionEl, delay: 1080, duration: 520, ease: softEase, from: { opacity: 0, transform: 'translateY(8px)' } }
     ];
 
     if (!reduceMotion && typeof Element.prototype.animate === 'function') {
@@ -358,20 +346,13 @@ export default function LoginPage() {
           --pph-fs: 17.29px; --pph-ls: -0.698px; --pph-left: 18px; --pph-fw: 400;
           --login-fs: 16.38px; --login-fw: 400; --login-ls: 0.200px; --login-gap: 10px; --login-dy: 0.00px; --login-padl: -12.00px;
           --arrow-w: 13.2px;
-          --div-top: 477px; --or-fs: 11.5px; --or-fw: 700; --or-ls: 0.8px; --or-dy: 2.00px; --or-dx: 0.00px;
-          --or-line-l: 205px; --or-line-r: 204px;
-          --g-gap: 17px; --g-icon: 18.5px;
-          --gt-fs: 18.10px; --gt-fw: 400; --gt-ls: -0.217px; --gt-ws: -1.000px; --gt-dy: 1.00px;
-          --bt-top: 611.00px; --bt-fs: 16.37px; --bt-fw: 400; --bt-ls: -0.196px; --bt-ws: -2.060px; --bt-fwb: 700; --bt-uo: 3px;
-          --card-shadow: 1px 10px 14px rgba(10,14,20,0.14), 0 1px 3px rgba(10,14,20,0.05);
+          --card-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.10), 0 0 0 1px rgba(15, 23, 42, 0.04);
           --cs: 1;
 
-          --ink: #000;          --h1-color: #2c3343;   --sub-grey: #797979;
-          --badge-bg: #2f2a27;  --ph: #606060;         --or: #5a5a5b;
-          --gtext: #232424;     --bottom: #0a0a0a;
-          --btn1: #283139;      --btn2: #293340;
-          --inputFill: #fafafa; --inputBorder: #acacae; --pwFill: #f9f9f9;
-          --gBorder: #c8c8ca;   --divider: #b1b1b2;     --page: #fefefe;
+          --ink: #0f172a;        --h1-color: #172D35;   --sub-grey: #64748b;
+          --badge-bg: #2f2a27;  --ph: #94a3b8;         --page: #f8fafc;
+          --btn1: #172D35;      --btn2: #087F8C;
+          --inputFill: #f8fafc; --inputBorder: #e2e8f0; --pwFill: #f8fafc;
 
           --mobile-hero-h: clamp(244px, 34svh, 304px);
         }
@@ -512,10 +493,10 @@ export default function LoginPage() {
           height: 922px;
           border-radius: 26px;
           overflow: hidden;
-          background: rgba(254, 254, 254, 0.90);
-          backdrop-filter: blur(28px) saturate(160%);
-          -webkit-backdrop-filter: blur(28px) saturate(160%);
-          border: 1px solid rgba(0, 0, 0, 0.036);
+          background: rgba(254, 254, 254, 0.94);
+          backdrop-filter: blur(32px) saturate(160%);
+          -webkit-backdrop-filter: blur(32px) saturate(160%);
+          border: 1px solid rgba(0, 0, 0, 0.04);
           box-shadow: var(--card-shadow);
         }
 
@@ -553,12 +534,12 @@ export default function LoginPage() {
           word-spacing: var(--sub-ws);
           font-weight: var(--sub-fw);
           color: var(--sub-grey);
-          line-height: 1.3;
+          line-height: 1.35;
         }
 
         #sub b {
           font-weight: var(--sub-fwb);
-          color: var(--ink);
+          color: #087F8C;
         }
 
         .field {
@@ -567,7 +548,8 @@ export default function LoginPage() {
           width: 489px;
           display: flex;
           align-items: center;
-          border-radius: 12px;
+          border-radius: 14px;
+          transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
         }
 
         .field input {
@@ -582,7 +564,7 @@ export default function LoginPage() {
 
         .field input::placeholder {
           color: var(--ph);
-          opacity: 1;
+          opacity: 0.9;
         }
 
         #email {
@@ -590,6 +572,12 @@ export default function LoginPage() {
           height: 61px;
           background: var(--inputFill);
           border: 1.5px solid var(--inputBorder);
+        }
+
+        #email:focus-within {
+          border-color: #087F8C;
+          box-shadow: 0 0 0 3.5px rgba(8, 127, 140, 0.12);
+          background: #ffffff;
         }
 
         #email input {
@@ -605,7 +593,13 @@ export default function LoginPage() {
           top: 273.5px;
           height: 59px;
           background: var(--pwFill);
-          border: 0;
+          border: 1.5px solid var(--inputBorder);
+        }
+
+        #pw:focus-within {
+          border-color: #087F8C;
+          box-shadow: 0 0 0 3.5px rgba(8, 127, 140, 0.12);
+          background: #ffffff;
         }
 
         #pw input {
@@ -623,7 +617,7 @@ export default function LoginPage() {
           width: 489px;
           height: 65.5px;
           border-radius: 999px;
-          background: linear-gradient(180deg, var(--btn1) 0%, var(--btn2) 100%);
+          background: linear-gradient(135deg, #172D35 0%, #087F8C 100%);
           color: #fff;
           display: flex;
           align-items: center;
@@ -631,18 +625,20 @@ export default function LoginPage() {
           gap: var(--login-gap);
           padding-left: var(--login-padl);
           padding-right: 4px;
-          box-shadow: 0 8px 20px rgba(18, 26, 34, 0.16), 0 2px 5px rgba(18, 26, 34, 0.10);
+          box-shadow: 0 10px 25px -4px rgba(8, 127, 140, 0.28), 0 4px 10px -2px rgba(23, 45, 53, 0.2);
           border: none;
           cursor: pointer;
           font-size: var(--login-fs);
-          font-weight: var(--login-fw);
+          font-weight: 500;
           letter-spacing: var(--login-ls);
           font-family: inherit;
           transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.18s ease, filter 0.18s ease;
         }
 
         #loginBtn:hover {
-          filter: brightness(1.12);
+          filter: brightness(1.08);
+          box-shadow: 0 14px 30px -4px rgba(8, 127, 140, 0.38), 0 6px 14px -2px rgba(23, 45, 53, 0.25);
+          transform: translateY(-1px);
         }
 
         #loginBtn:active {
@@ -654,96 +650,161 @@ export default function LoginPage() {
           transform: translateY(var(--login-dy));
         }
 
-        .divider {
-          position: absolute;
-          left: 63px;
-          top: var(--div-top);
-          width: 487px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--or);
-        }
-
-        .divider i {
-          height: 1.5px;
-          background: var(--divider);
-          display: block;
-        }
-
-        .divider i:first-child {
-          flex: 0 0 var(--or-line-l);
-        }
-
-        .divider i:last-child {
-          flex: 0 0 var(--or-line-r);
-        }
-
-        .divider b {
-          flex: 1 1 auto;
-          text-align: center;
-          font-size: var(--or-fs);
-          font-weight: var(--or-fw);
-          letter-spacing: var(--or-ls);
-          transform: translate(var(--or-dx), var(--or-dy));
-        }
-
-        #gBtn {
+        /* Demo Quick Access Redesign */
+        .demo-section {
           position: absolute;
           left: 62px;
-          top: 535px;
+          top: 472px;
           width: 489px;
-          height: 59.5px;
-          border: 1.5px solid var(--gBorder);
-          border-radius: 999px;
-          background: rgba(255, 255, 255, 0.92);
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .demo-header {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: var(--g-gap);
-          color: var(--gtext);
+          gap: 12px;
+          width: 100%;
+        }
+
+        .demo-line {
+          flex: 1;
+          height: 1px;
+          background: linear-gradient(90deg, rgba(172, 172, 174, 0.15), rgba(172, 172, 174, 0.45), rgba(172, 172, 174, 0.15));
+        }
+
+        .demo-header-text {
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #64748b;
+        }
+
+        .demo-cards-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          width: 100%;
+        }
+
+        .demo-card-btn {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 12px 8px;
+          border-radius: 14px;
+          background: #ffffff;
+          border: 1.5px solid #e2e8f0;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
           cursor: pointer;
-          font-size: var(--gt-fs);
-          font-weight: var(--gt-fw);
-          letter-spacing: var(--gt-ls);
-          word-spacing: var(--gt-ws);
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
           font-family: inherit;
-          transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
         }
 
-        #gBtn:hover {
-          background: #fff;
-          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+        .demo-card-btn:hover {
+          background: #f8fafc;
+          border-color: #cbd5e1;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.07);
         }
 
-        #gBtn:active {
-          transform: translateY(1px);
+        .demo-card-btn.active {
+          background: #242c38;
+          border-color: #242c38;
+          color: #ffffff;
+          box-shadow: 0 4px 14px rgba(36, 44, 56, 0.24);
+          transform: translateY(-1px);
         }
 
-        #gBtn span {
-          transform: translateY(var(--gt-dy));
+        .demo-role-name {
+          font-size: 13.5px;
+          font-weight: 600;
+          color: #1e293b;
+          letter-spacing: -0.01em;
+          transition: color 0.15s ease;
         }
 
-        #bottom {
+        .demo-card-btn.active .demo-role-name {
+          color: #ffffff;
+        }
+
+        .demo-role-sub {
+          font-size: 10.5px;
+          color: #64748b;
+          margin-top: 2px;
+          font-weight: 400;
+          transition: color 0.15s ease;
+        }
+
+        .demo-card-btn.active .demo-role-sub {
+          color: rgba(255, 255, 255, 0.78);
+        }
+
+        .demo-badge-indicator {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
           position: absolute;
-          left: 62px;
-          width: 489px;
-          top: var(--bt-top);
-          text-align: center;
-          font-size: var(--bt-fs);
-          font-weight: var(--bt-fw);
-          letter-spacing: var(--bt-ls);
-          word-spacing: var(--bt-ws);
-          color: var(--bottom);
+          top: 8px;
+          right: 8px;
         }
 
-        #bottom a {
-          color: #000;
-          font-weight: var(--bt-fwb);
-          text-decoration: underline;
-          text-underline-offset: var(--bt-uo);
-          text-decoration-thickness: 2px;
+        .demo-hint {
+          font-size: 11.5px;
+          color: #94a3b8;
+          text-align: center;
+          margin-top: 2px;
+        }
+
+        /* Bottom Left Button to Landing Page */
+        .landing-back-btn {
+          position: fixed;
+          bottom: 24px;
+          left: 24px;
+          z-index: 100;
+          display: inline-flex;
+          align-items: center;
+          gap: 9px;
+          padding: 10px 18px 10px 14px;
+          border-radius: 999px;
+          background: rgba(18, 22, 28, 0.88);
+          backdrop-filter: blur(14px) saturate(140%);
+          -webkit-backdrop-filter: blur(14px) saturate(140%);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          color: #f8fafc;
+          font-size: 13px;
+          font-weight: 500;
+          letter-spacing: -0.01em;
+          text-decoration: none;
+          box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.15);
+          transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+          cursor: pointer;
+        }
+
+        .landing-back-btn:hover {
+          background: rgba(28, 34, 42, 0.98);
+          border-color: rgba(255, 255, 255, 0.32);
+          color: #ffffff;
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.38), 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .landing-back-btn:active {
+          transform: translateY(0px) scale(0.98);
+        }
+
+        .landing-back-btn svg {
+          transition: transform 0.2s ease;
+        }
+
+        .landing-back-btn:hover svg {
+          transform: translateX(-2px);
         }
 
         :focus-visible {
@@ -822,9 +883,7 @@ export default function LoginPage() {
         body.tabport .col,
         body.tabport .field,
         body.tabport #loginBtn,
-        body.tabport .divider,
-        body.tabport #gBtn,
-        body.tabport #bottom {
+        body.tabport .demo-section {
           left: var(--tp-pad) !important;
           width: calc(100% - (var(--tp-pad) * 2)) !important;
         }
@@ -864,25 +923,8 @@ export default function LoginPage() {
           gap: var(--tp-btn-gap) !important;
         }
 
-        body.tabport .divider {
-          top: var(--tp-div-top) !important;
-        }
-
-        body.tabport .divider b {
-          font-size: var(--tp-or-fs) !important;
-          padding: 0 var(--tp-or-pad) !important;
-        }
-
-        body.tabport #gBtn {
-          top: var(--tp-g-top) !important;
-          height: var(--tp-g-h) !important;
-          font-size: var(--tp-gt-fs) !important;
-          gap: var(--tp-g-gap) !important;
-        }
-
-        body.tabport #bottom {
-          top: var(--tp-bt-top) !important;
-          font-size: var(--tp-bt-fs) !important;
+        body.tabport .demo-section {
+          top: var(--tp-demo-top) !important;
         }
 
         /* Mobile Stacked Mode (<700px) */
@@ -1003,15 +1045,13 @@ export default function LoginPage() {
           width: 100% !important;
           height: auto !important;
           transform: none !important;
-          gap: 14px;
+          gap: 16px;
         }
 
         body.stacked .col,
         body.stacked .field,
         body.stacked #loginBtn,
-        body.stacked .divider,
-        body.stacked #gBtn,
-        body.stacked #bottom {
+        body.stacked .demo-section {
           position: static !important;
           left: auto !important;
           top: auto !important;
@@ -1042,20 +1082,11 @@ export default function LoginPage() {
 
         body.stacked #loginBtn {
           height: 58px !important;
-          margin-top: 6px;
+          margin-top: 4px;
         }
 
-        body.stacked .divider {
-          margin: 10px 0;
-        }
-
-        body.stacked #gBtn {
-          height: 56px !important;
-        }
-
-        body.stacked #bottom {
-          font-size: 14px !important;
-          margin-top: 14px;
+        body.stacked .demo-section {
+          margin-top: 8px;
         }
 
         @media (max-width: 370px) {
@@ -1089,9 +1120,7 @@ export default function LoginPage() {
         .entry-pending #email,
         .entry-pending #pw,
         .entry-pending #loginBtn,
-        .entry-pending .divider,
-        .entry-pending #gBtn,
-        .entry-pending #bottom {
+        .entry-pending #demoSection {
           opacity: 0;
           will-change: transform, opacity, clip-path;
         }
@@ -1104,10 +1133,8 @@ export default function LoginPage() {
         .entry-pending #sub { transform: translateY(10px); }
         .entry-pending #email,
         .entry-pending #pw,
-        .entry-pending #loginBtn,
-        .entry-pending #gBtn { transform: translateY(8px); }
-        .entry-pending .divider,
-        .entry-pending #bottom { transform: translateY(6px); }
+        .entry-pending #loginBtn { transform: translateY(8px); }
+        .entry-pending #demoSection { transform: translateY(8px); }
 
         @media (max-width: 699px) {
           .entry-pending .card { transform: translateY(14px); }
@@ -1129,9 +1156,7 @@ export default function LoginPage() {
           .entry-pending #email,
           .entry-pending #pw,
           .entry-pending #loginBtn,
-          .entry-pending .divider,
-          .entry-pending #gBtn,
-          .entry-pending #bottom {
+          .entry-pending #demoSection {
             opacity: 1 !important;
             transform: none !important;
             clip-path: none !important;
@@ -1139,6 +1164,26 @@ export default function LoginPage() {
           }
         }
       `}</style>
+
+      {/* Floating Button in Bottom Left to Go to Landing Page */}
+      <Link
+        href="/"
+        className="landing-back-btn"
+        aria-label="Back to landing page"
+      >
+        <svg
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ width: 15, height: 15 }}
+        >
+          <path d="M15 10H5M10 15l-5-5 5-5" />
+        </svg>
+        <span>Back to Landing Page</span>
+      </Link>
 
       {/* Hero Media (falcon video) */}
       <section className="photo">
@@ -1172,12 +1217,6 @@ export default function LoginPage() {
         <div className="scrim"></div>
 
         <div className="hero" id="hero">
-          <div className="badge">
-            <svg className="badge-glyph" viewBox="0 0 582 557" fillRule="evenodd">
-              <path fill="#fff" d="M449.0 0.0 435.0 0.0 415.0 10.0 200.0 249.0 187.0 276.0 189.0 299.0 212.0 326.0 232.0 332.0 289.0 334.0 289.0 516.0 301.0 543.0 324.0 556.0 346.0 556.0 374.0 536.0 573.0 311.0 582.0 288.0 579.0 264.0 559.0 240.0 539.0 233.0 478.0 230.0 478.0 32.0 470.0 13.0ZM442.0 38.0 446.0 250.0 466.0 267.0 540.0 270.0 547.0 285.0 341.0 520.0 332.0 522.0 324.0 514.0 321.0 314.0 307.0 300.0 295.0 297.0 233.0 297.0 224.0 291.0 221.0 282.0ZM1.0 67.0 4.0 81.0 17.0 90.0 216.0 90.0 223.0 87.0 232.0 74.0 228.0 57.0 215.0 49.0 18.0 49.0 5.0 57.0ZM0.0 285.0 4.0 300.0 17.0 308.0 105.0 308.0 118.0 299.0 121.0 291.0 119.0 278.0 111.0 270.0 103.0 267.0 17.0 267.0 4.0 275.0ZM1.0 495.0 4.0 511.0 10.0 517.0 23.0 520.0 179.0 520.0 191.0 516.0 200.0 500.0 196.0 488.0 182.0 479.0 18.0 479.0 9.0 483.0Z"/>
-            </svg>
-            <span id="badgeTxt">Built for fast-moving teams</span>
-          </div>
           <div className="hl-wrap">
             <span className="hl" id="hl1">Find Signal to Action</span>
             <span className="hl" id="hl2">Instantly</span>
@@ -1250,69 +1289,50 @@ export default function LoginPage() {
               </svg>
             </button>
 
-            <div className="divider">
-              <i></i><b>OR</b><i></i>
+            {/* Redesigned Demo Quick Fill Section */}
+            <div className="demo-section" id="demoSection">
+              <div className="demo-header">
+                <div className="demo-line" />
+                <span className="demo-header-text">Demo Quick Access</span>
+                <div className="demo-line" />
+              </div>
+
+              <div className="demo-cards-row">
+                <button
+                  type="button"
+                  onClick={() => fillCredentials('admin', 'admin@rehabpulse.com')}
+                  className={`demo-card-btn ${selectedRole === 'admin' ? 'active' : ''}`}
+                >
+                  <span className="demo-badge-indicator" style={{ backgroundColor: '#8b5cf6' }} />
+                  <span className="demo-role-name">Admin</span>
+                  <span className="demo-role-sub">Full System</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => fillCredentials('therapist', 'therapist@rehabpulse.com')}
+                  className={`demo-card-btn ${selectedRole === 'therapist' ? 'active' : ''}`}
+                >
+                  <span className="demo-badge-indicator" style={{ backgroundColor: '#087f8c' }} />
+                  <span className="demo-role-name">Therapist</span>
+                  <span className="demo-role-sub">Clinical Portal</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => fillCredentials('patient', 'patient@rehabpulse.com')}
+                  className={`demo-card-btn ${selectedRole === 'patient' ? 'active' : ''}`}
+                >
+                  <span className="demo-badge-indicator" style={{ backgroundColor: '#10b981' }} />
+                  <span className="demo-role-name">Patient</span>
+                  <span className="demo-role-sub">Recovery Track</span>
+                </button>
+              </div>
+
+              <p className="demo-hint">
+                Select a role to populate credentials, then click <b>Login</b>.
+              </p>
             </div>
-
-            <button
-              id="gBtn"
-              type="button"
-              onClick={() => fillCredentials('therapist@rehabpulse.com')}
-              title="Click to fill therapist demo credentials"
-            >
-              <svg viewBox="0 0 48 48" style={{ width: 'var(--g-icon)', height: 'var(--g-icon)', flexShrink: 0 }}>
-                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-              </svg>
-              <span>Sign in with Google</span>
-            </button>
-
-            {/* Quick Demo Access Bar */}
-            <div
-              style={{
-                position: 'absolute',
-                left: '62px',
-                top: '670px',
-                width: '489px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                fontSize: '11.5px',
-                color: '#6b7280',
-              }}
-            >
-              <span>Demo quick fill:</span>
-              <button
-                type="button"
-                onClick={() => fillCredentials('admin@rehabpulse.com')}
-                style={{ background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer', textDecoration: 'underline', padding: '0 4px', fontSize: '11.5px' }}
-              >
-                Admin
-              </button>
-              <span>·</span>
-              <button
-                type="button"
-                onClick={() => fillCredentials('therapist@rehabpulse.com')}
-                style={{ background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer', textDecoration: 'underline', padding: '0 4px', fontSize: '11.5px' }}
-              >
-                Therapist
-              </button>
-              <span>·</span>
-              <button
-                type="button"
-                onClick={() => fillCredentials('patient@rehabpulse.com')}
-                style={{ background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer', textDecoration: 'underline', padding: '0 4px', fontSize: '11.5px' }}
-              >
-                Patient
-              </button>
-            </div>
-
-            <p id="bottom">
-              Don&#8217;t have an account? <a href="#">Start Free</a>
-            </p>
           </form>
         </div>
       </section>
