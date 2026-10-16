@@ -10,16 +10,17 @@ export default {
         brand: '#3D81E3',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        geist: ['Geist', 'sans-serif'],
+        sans: ['Geist', 'system-ui', 'sans-serif'],
       },
       keyframes: {
-        shiny: {
-          '0%': { backgroundPosition: '-200% center' },
-          '100%': { backgroundPosition: '200% center' },
+        fadeSlideUp: {
+          'from': { opacity: '0', transform: 'translateY(24px)' },
+          'to': { opacity: '1', transform: 'translateY(0)' },
         },
       },
       animation: {
-        shiny: 'shiny 6s linear infinite',
+        fadeSlideUp: 'fadeSlideUp 0.8s ease both',
       },
     },
   },

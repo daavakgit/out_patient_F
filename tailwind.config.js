@@ -80,6 +80,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', 'var(--font-inter)', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        geist: ['Geist', 'sans-serif'],
       },
       keyframes: {
         "pulse-slow": {
@@ -90,6 +91,10 @@ module.exports = {
           "0%": { opacity: 0 },
           "100%": { opacity: 1 },
         },
+        fadeSlideUp: {
+          from: { opacity: '0', transform: 'translateY(24px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
         shiny: {
           '0%': { backgroundPosition: '-200% center' },
           '100%': { backgroundPosition: '200% center' },
@@ -98,6 +103,7 @@ module.exports = {
       animation: {
         "pulse-slow": "pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "fade-in": "fade-in 0.2s ease-out forwards",
+        fadeSlideUp: "fadeSlideUp 0.8s ease both",
         shiny: "shiny 6s linear infinite",
       },
     },

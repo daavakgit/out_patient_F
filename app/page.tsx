@@ -1,20 +1,10 @@
-import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/lib/auth/session';
+import FoldcraftHero from '@/components/FoldcraftHero';
 
-export default async function HomePage() {
-  const session = await getCurrentUser();
+export const metadata = {
+  title: 'Foldcraft — Creative Studio',
+  description: 'Shaping visual narratives, one pixel at a time.',
+};
 
-  if (!session) {
-    redirect('/login');
-  }
-
-  if (session.role === 'ADMIN') {
-    redirect('/admin/dashboard');
-  } else if (session.role === 'THERAPIST') {
-    redirect('/therapist/dashboard');
-  } else if (session.role === 'PATIENT') {
-    redirect('/patient/dashboard');
-  }
-
-  redirect('/login');
+export default function HomePage() {
+  return <FoldcraftHero />;
 }
