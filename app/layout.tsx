@@ -12,6 +12,13 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'RehabPulse | Physical Therapy Rehabilitation Milestone Tracker',
   description: 'Outpatient Physical Therapy Rehabilitation Milestone Tracker and Patient Portal',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
@@ -22,11 +29,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <head>
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${inter.className} font-sans bg-black text-white antialiased min-h-screen`}>
+      <body className={`${inter.className} font-sans bg-black text-white antialiased`}>
         {children}
       </body>
     </html>
